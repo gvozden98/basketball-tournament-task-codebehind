@@ -1,0 +1,20 @@
+{
+  "name": "basketball-tournament-task-codebehind",
+  "version": "1.0.0",
+  "description": "zadatak za praksu codebehind",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/gvozden98/basketball-tournament-task-codebehind.git"
+  },
+  "author": "Ognjen Gvozdenovic",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/gvozden98/basketball-tournament-task-codebehind/issues"
+  },
+  "homepage": "https://github.com/gvozden98/basketball-tournament-task-codebehind#readme"
+}
