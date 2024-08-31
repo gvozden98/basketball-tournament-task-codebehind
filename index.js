@@ -1,6 +1,11 @@
+/*
+Nisi hendlao predane utakmice
+
+
+*/
+
 console.log("hello world");
 const fs = require("fs");
-const { resourceLimits } = require("worker_threads");
 
 function loadTeamsAndMatches() {
   const groupsData = JSON.parse(fs.readFileSync("groups.json", "utf8"));
@@ -12,26 +17,17 @@ function loadTeamsAndMatches() {
 
 function simulateMatches({ groupsData, exhibitionsData }) {
   let zreb = [];
-  let games = [];
+  let gamesByGroup;
   for (const group in groupsData) {
-    console.log(`Group ${group}:`);
-
-    for (let i = 0; i < groupsData[group].length - 1; i++) {
-      for (let j = i + 1; j < groupsData[group].length; j++) {
-        const team1 = groupsData[group][i];
-        const team2 = groupsData[group][j];
-        games.push(simulateGame(team1, team2));
-      }
-    }
+    gamesByGroup = simulateGroup(group, groupsData[group]);
+    makeTable(gamesByGroup);
   }
-  //console.log(games);
+
   return zreb;
 }
 
 function simulateGame(team1, team2) {
   let results = {};
-  //console.log(team1, team2);
-  //console.log(team1.Team + " vs " + team2.Team);
   const rankDiff = team1.FIBARanking - team2.FIBARanking;
   const prob1 = 1 / (1 + Math.exp(rankDiff / 10));
   const randomOutcome = Math.random();
@@ -48,7 +44,11 @@ function simulateGame(team1, team2) {
       score1 = score2 + Math.floor(Math.random() * 10) + 1; // Ensure team A's score is higher
     }
 
-    results = { Winner: team1.Team, Teams: [team1, team2] };
+    results = {
+      Winner: team1.ISOCode,
+      Loser: team2.ISOCode,
+      Teams: [team1, team2],
+    };
   } else {
     if (Math.abs(rankDiff) < 4) {
       score2 = score1 + Math.floor(Math.random() * 3) + 1; // If the teams are closely ranked make sure to simulate a close game
@@ -57,27 +57,44 @@ function simulateGame(team1, team2) {
       score2 = score1 + Math.floor(Math.random() * 10) + 1; // Ensure team A's score is higher
     }
 
-    results = { Winner: team2.Team, Teams: [team1, team2] };
+    results = {
+      Winner: team2.ISOCode,
+      Loser: team1.ISOCode,
+      Teams: [team1, team2],
+    };
   }
+
   team1.Score = score1;
   team2.Score = score2;
-  console.log(rankDiff);
-  //   console.log(
-  //     team1Wins +
-  //       " " +
-  //       probA +
-  //       "skor " +
-  //       team1.Team +
-  //       " vs " +
-  //       team2.Team +
-  //       " -> " +
-  //       score1 +
-  //       " " +
-  //       score2
-  //   );
-
-  console.log(results);
   return results;
+}
+
+function simulateGroup(group, teams) {
+  let gamesByGroups = {
+    Group: group,
+    games: [],
+  };
+  for (let i = 0; i < teams.length - 1; i++) {
+    for (let j = i + 1; j < teams.length; j++) {
+      const team1 = teams[i];
+      const team2 = teams[j];
+
+      gamesByGroups.games.push(simulateGame(team1, team2));
+    }
+  }
+  //console.log(gamesByGroups.games[0].Teams[0]);
+  //printGames(games);
+  return gamesByGroups;
+}
+
+function makeTable(gamesByGroup) {
+  console.log(gamesByGroup);
+}
+function printGames(games) {
+  for (let index = 0; index < games.length; index++) {
+    const element = games[index];
+    console.log(element);
+  }
 }
 function main() {
   const { groupsData, exhibitionsData } = loadTeamsAndMatches();
